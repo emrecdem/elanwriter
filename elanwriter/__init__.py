@@ -1,10 +1,13 @@
 import xml.etree.cElementTree as ET
+import warnings
+import collections
+import sys
 # import main
 
 
 class ElanDoc(object):
 
-    def __init__(self, rel_video_url=""):# , tier_name="default"):
+    def __init__(self, rel_video_url=""):
 
         self.LINGUISTIC_TYPE_REF = "default-lt"
 
@@ -46,6 +49,28 @@ class ElanDoc(object):
         self.annotation_i = 1
 
     def add_annotation(self, time_tuple, annotation_text, tier_name="default"):
+        # Parameter checking
+        if not isinstance(annotation_text, str):
+            try:
+                warnings.warn("Cast annotation_text variabel of add_annotation from "+str(type(annotation_text))+" to string")
+                annotation_text = str(annotation_text)
+            except Exception as e:
+                raise e
+
+        if not isinstance(tier_name, str):
+            try:
+                warnings.warn("Cast tier_name variabel of add_annotation from "+str(type(tier_name))+" to string")
+                tier_name = str(tier_name)
+            except Exception as e:
+                raise e
+        
+        if not isinstance(time_tuple, collections.Iterable):
+            raise Exception("The time_tuple given to add_annotation is not an iterable (annotation_text="+annotation_text+")")
+        elif len(time_tuple) != 2:
+            raise Exception("The time_tuple given to add_annotation is not of length 2 (annotation_text="+annotation_text+", length="+str(len(time_tuple))+")")
+
+
+        # Make a new tier in the XML file if it does not exist
         if tier_name not in self.tiers:
             self.tiers.update({tier_name:
                                 ET.SubElement(self.ann_doc,
@@ -54,6 +79,7 @@ class ElanDoc(object):
                                               TIER_ID=tier_name)
                               })
 
+        # Add the times to the time slot
         ET.SubElement(self.time_order, "TIME_SLOT",
                       TIME_SLOT_ID="ts"+str(self.time_slot_i),
                       TIME_VALUE=str(time_tuple[0]))
@@ -65,6 +91,7 @@ class ElanDoc(object):
         ts2 = self.time_slot_i
         self.time_slot_i += 1
 
+        # Add the annotations to the tier
         ann = ET.SubElement(self.tiers[tier_name], "ANNOTATION")
         ann_align = ET.SubElement(ann, "ALIGNABLE_ANNOTATION",
                                   ANNOTATION_ID="a"+str(self.annotation_i),
@@ -79,5 +106,4 @@ class ElanDoc(object):
     def write(self, filename="output.eaf"):
         tree = ET.ElementTree(self.ann_doc)
         tree.write(filename)
-# ET.SubElement(doc, "field1", name="blah").text = "some value1"
-# ET.SubElement(doc, "field2", name="asdfasd").text = "some vlaue2"
+
