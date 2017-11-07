@@ -82,12 +82,12 @@ class ElanDoc(object):
         # Add the times to the time slot
         ET.SubElement(self.time_order, "TIME_SLOT",
                       TIME_SLOT_ID="ts"+str(self.time_slot_i),
-                      TIME_VALUE=str(time_tuple[0]))
+                      TIME_VALUE=str(int(time_tuple[0])))
         ts1 = self.time_slot_i
         self.time_slot_i += 1
         ET.SubElement(self.time_order, "TIME_SLOT",
                       TIME_SLOT_ID="ts"+str(self.time_slot_i),
-                      TIME_VALUE=str(time_tuple[1]))
+                      TIME_VALUE=str(int(time_tuple[1])))
         ts2 = self.time_slot_i
         self.time_slot_i += 1
 
