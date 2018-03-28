@@ -11,6 +11,7 @@ class ElanDoc(object):
 
         self.LINGUISTIC_TYPE_REF = "default-lt"
 
+        # Implement a time annotation here
         self.ann_doc = ET.Element("ANNOTATION_DOCUMENT", AUTHOR="",
                                   DATE="2017-10-26T14:58:41+01:00",
                                   FORMAT="3.0",
@@ -19,6 +20,7 @@ class ElanDoc(object):
                                     MEDIA_FILE="",
                                     TIME_UNITS="milliseconds")
 
+        # Implement a correct video type implementation here
         ET.SubElement(self.header, "MEDIA_DESCRIPTOR",
                         MEDIA_URL="file:///./"+rel_video_url,
                         MIME_TYPE="video/mp4",
@@ -40,6 +42,7 @@ class ElanDoc(object):
         self.time_order = ET.SubElement(self.ann_doc,
                                         "TIME_ORDER")
 
+        # Implement that you only write an empty tier if the file is indeed empty
         self.tiers = {"default": ET.SubElement(self.ann_doc,
                                    "TIER",
                                    LINGUISTIC_TYPE_REF=self.LINGUISTIC_TYPE_REF,
