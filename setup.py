@@ -1,37 +1,27 @@
-from setuptools import setup
-
+#from setuptools import setup
+import setuptools
 
 def readme():
     with open('README.rst') as f:
         return f.read()
 
 
-setup(name='elanwriter',
-      version='0.1',
+setuptools.setup(name='elanwriter',
+      version='0.0.0.dev1',
       description='',
       long_description=readme(),
-      # classifiers=[
-      #   'Development Status :: under developement',
-      #   'License :: nothing yet',
-      #   'Programming Language :: Python :: 2.7',
-      #   'Topic :: astronomical :: calculations :: minerals',
-      # ],
+      long_description_content_type='text/markdown',
+      url='https://github.com/emrecdem/elanwriter',
+    classifiers=(
+        'Development Status :: 3 - Alpha',
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
+    ),
       keywords='',
       #url='https://github.com/bldevries/opacity_calculator',
       author='B.L. de Vries',
-      author_email='',
-      license='',
-      packages=['elanwriter'],
-      # package_data={
-      #     'write_elan_eaf_files': ['main.py'],
-      # },
-      # install_requires=[
-      #     'markdown',
-      # ],
-      # test_suite='nose.collector',
-      # tests_require=['nose', 'nose-cover3'],
-      # entry_points={
-      #     'console_scripts': ['funniest-joke=funniest.command_line:main'],
-      # },
-      #include_package_data=True,
-      zip_safe=True)
+      author_email='b.devries@esciencecenter.nl',
+      packages=setuptools.find_packages(),
+#      zip_safe=True)
+      )
