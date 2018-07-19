@@ -2,7 +2,7 @@ import xml.etree.cElementTree as ET
 import warnings
 import collections
 import sys
-# import main
+import datetime
 
 
 class ElanDoc(object):
@@ -13,7 +13,7 @@ class ElanDoc(object):
 
         # Implement a time annotation here
         self.ann_doc = ET.Element("ANNOTATION_DOCUMENT", AUTHOR="",
-                                  DATE="2017-10-26T14:58:41+01:00",
+                                  DATE=datetime.datetime.now().strftime("%y-%m-%dT%H:%M:%S"),
                                   FORMAT="3.0",
                                   VERSION="3.0")
         self.header = ET.SubElement(self.ann_doc, "HEADER",
@@ -105,6 +105,9 @@ class ElanDoc(object):
     def dump(self):
         tree = ET.ElementTree(self.ann_doc)
         ET.dump(tree)
+
+    def _get_doc(self):
+        return self.ann_doc
 
     def write(self, filename="output.eaf"):
         tree = ET.ElementTree(self.ann_doc)
