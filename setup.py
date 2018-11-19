@@ -6,7 +6,7 @@ def readme():
 
 
 setuptools.setup(name='elanwriter',
-      version='0.0.0.dev1',
+      version='0.0.0.dev2',
       description='A tool to write out Elan (.eaf) files using python.',
       long_description=readme(),
       long_description_content_type='text/markdown',

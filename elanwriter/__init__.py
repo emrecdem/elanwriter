@@ -2,8 +2,10 @@ import xml.etree.cElementTree as ET
 import warnings
 import collections
 import sys
+import os
 import datetime
 
+__version__ = "0.0.0.dev2"
 
 class ElanDoc(object):
 
@@ -34,10 +36,10 @@ class ElanDoc(object):
                       COUNTRY_CODE="US",
                       LANGUAGE_CODE="en")
 
-#         <CONSTRAINT DESCRIPTION="Time subdivision of parent annotation's time interval, no time gaps allowed within this interval" STEREOTYPE="Time_Subdivision"/>
-#         <CONSTRAINT DESCRIPTION="Symbolic subdivision of a parent annotation. Annotations refering to the same parent are ordered" STEREOTYPE="Symbolic_Subdivision"/>
-#         <CONSTRAINT DESCRIPTION="1-1 association with a parent annotation" STEREOTYPE="Symbolic_Association"/>
-#         <CONSTRAINT DESCRIPTION="Time alignable annotations within the parent annotation's time interval, gaps are allowed" STEREOTYPE="Included_In"/>
+    #         <CONSTRAINT DESCRIPTION="Time subdivision of parent annotation's time interval, no time gaps allowed within this interval" STEREOTYPE="Time_Subdivision"/>
+    #         <CONSTRAINT DESCRIPTION="Symbolic subdivision of a parent annotation. Annotations refering to the same parent are ordered" STEREOTYPE="Symbolic_Subdivision"/>
+    #         <CONSTRAINT DESCRIPTION="1-1 association with a parent annotation" STEREOTYPE="Symbolic_Association"/>
+    #         <CONSTRAINT DESCRIPTION="Time alignable annotations within the parent annotation's time interval, gaps are allowed" STEREOTYPE="Included_In"/>
 
         self.time_order = ET.SubElement(self.ann_doc,
                                         "TIME_ORDER")
@@ -113,3 +115,49 @@ class ElanDoc(object):
         tree = ET.ElementTree(self.ann_doc)
         tree.write(filename)
 
+    # END CLASS ELANDOC
+
+def write_elan_file(detections, video_path, output_path):
+      ##
+    # Make the Elan file
+    ##
+    video_dir = os.path.dirname(video_path)
+    video_filename = os.path.basename(video_path)
+
+    output_dir = os.path.dirname(output_path)
+    output_filename = os.path.basename(output_path)
+
+    if video_dir == "":
+        video_dir = "."
+
+    if os.path.isfile(video_path):
+        rel_video_path = os.path.join( os.path.relpath(video_dir, output_dir), video_filename )
+    else:
+        #warnings.warn("No video file found for the elan file. Video file: {}".format(video_path))
+        rel_video_path = "video_not_found"
+
+    #if not column_selection:
+    column_selection = set(detections["feature"])
+
+
+    print(rel_video_path, video_dir, output_path)
+    ed = ElanDoc(rel_video_path)
+  
+    ##
+    # Start looping over the FEATURES
+    for feat in column_selection:
+      
+        times = detections[detections["feature"] == feat]
+        for i in range(len(times)):
+            annotation_name = times.iloc[i]["feature"]
+            #if "modifier" in times.columns:
+            #    if times.iloc[i]["modifier"] and not np.isnan(times.iloc[i]["modifier"]):
+            annotation_name = feat#"I="+str(times.iloc[i]["modifier"])
+
+            ed.add_annotation((1000*times.iloc[i]["start"], 1000*times.iloc[i]["end"]), 
+                            annotation_name, tier_name=times.iloc[i]["feature"])
+        if len(times) == 0:
+            ed.add_annotation((0,0.1), 
+                                "", feat)
+
+    ed.write(output_path)
