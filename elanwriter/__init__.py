@@ -117,7 +117,7 @@ class ElanDoc(object):
 
     # END CLASS ELANDOC
 
-def write_elan_file(detections, video_path, output_path):
+def write_elan_file(detections, video_path, output_path, feature_col_name):
       ##
     # Make the Elan file
     ##
@@ -137,25 +137,23 @@ def write_elan_file(detections, video_path, output_path):
         rel_video_path = "video_not_found"
 
     #if not column_selection:
-    column_selection = set(detections["feature"])
+    column_selection = set(detections[feature_col_name])
 
-
-    print(rel_video_path, video_dir, output_path)
     ed = ElanDoc(rel_video_path)
   
     ##
     # Start looping over the FEATURES
     for feat in column_selection:
       
-        times = detections[detections["feature"] == feat]
+        times = detections[detections[feature_col_name] == feat]
         for i in range(len(times)):
-            annotation_name = times.iloc[i]["feature"]
+            annotation_name = times.iloc[i][feature_col_name]
             #if "modifier" in times.columns:
             #    if times.iloc[i]["modifier"] and not np.isnan(times.iloc[i]["modifier"]):
             annotation_name = feat#"I="+str(times.iloc[i]["modifier"])
 
             ed.add_annotation((1000*times.iloc[i]["start"], 1000*times.iloc[i]["end"]), 
-                            annotation_name, tier_name=times.iloc[i]["feature"])
+                            annotation_name, tier_name=times.iloc[i][feature_col_name])
         if len(times) == 0:
             ed.add_annotation((0,0.1), 
                                 "", feat)
