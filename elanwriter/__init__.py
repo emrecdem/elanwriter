@@ -36,11 +36,6 @@ class ElanDoc(object):
                       COUNTRY_CODE="US",
                       LANGUAGE_CODE="en")
 
-    #         <CONSTRAINT DESCRIPTION="Time subdivision of parent annotation's time interval, no time gaps allowed within this interval" STEREOTYPE="Time_Subdivision"/>
-    #         <CONSTRAINT DESCRIPTION="Symbolic subdivision of a parent annotation. Annotations refering to the same parent are ordered" STEREOTYPE="Symbolic_Subdivision"/>
-    #         <CONSTRAINT DESCRIPTION="1-1 association with a parent annotation" STEREOTYPE="Symbolic_Association"/>
-    #         <CONSTRAINT DESCRIPTION="Time alignable annotations within the parent annotation's time interval, gaps are allowed" STEREOTYPE="Included_In"/>
-
         self.time_order = ET.SubElement(self.ann_doc,
                                         "TIME_ORDER")
 
@@ -54,25 +49,14 @@ class ElanDoc(object):
         self.annotation_i = 1
 
     def add_annotation(self, time_tuple, annotation_text, tier_name="default"):
-        # Parameter checking
-        if not isinstance(annotation_text, str):
-            try:
-                warnings.warn("Cast annotation_text variabel of add_annotation from "+str(type(annotation_text))+" to string")
-                annotation_text = str(annotation_text)
-            except Exception as e:
-                raise e
 
-        if not isinstance(tier_name, str):
-            try:
-                warnings.warn("Cast tier_name variabel of add_annotation from "+str(type(tier_name))+" to string")
-                tier_name = str(tier_name)
-            except Exception as e:
-                raise e
-        
         if not isinstance(time_tuple, collections.Iterable):
-            raise Exception("The time_tuple given to add_annotation is not an iterable (annotation_text="+annotation_text+")")
+            raise Exception("The time_tuple given to add_annotation is not an \
+                            iterable (annotation_text="+annotation_text+")")
         elif len(time_tuple) != 2:
-            raise Exception("The time_tuple given to add_annotation is not of length 2 (annotation_text="+annotation_text+", length="+str(len(time_tuple))+")")
+            raise Exception("The time_tuple given to add_annotation is not of \
+                            length 2 (annotation_text="+annotation_text+", \
+                            length="+str(len(time_tuple))+")")
 
 
         # Make a new tier in the XML file if it does not exist
@@ -131,31 +115,28 @@ def write_elan_file(detections, video_path, output_path, feature_col_name):
         video_dir = "."
 
     if os.path.isfile(video_path):
-        rel_video_path = os.path.join( os.path.relpath(video_dir, output_dir), video_filename )
+        rel_video_path = os.path.join( os.path.relpath(video_dir, \
+            output_dir), video_filename )
     else:
-        #warnings.warn("No video file found for the elan file. Video file: {}".format(video_path))
         rel_video_path = "video_not_found"
 
-    #if not column_selection:
     column_selection = set(detections[feature_col_name])
 
     ed = ElanDoc(rel_video_path)
-  
+
     ##
     # Start looping over the FEATURES
     for feat in column_selection:
-      
+
         times = detections[detections[feature_col_name] == feat]
         for i in range(len(times)):
             annotation_name = times.iloc[i][feature_col_name]
-            #if "modifier" in times.columns:
-            #    if times.iloc[i]["modifier"] and not np.isnan(times.iloc[i]["modifier"]):
-            annotation_name = feat#"I="+str(times.iloc[i]["modifier"])
+            annotation_name = feat
 
-            ed.add_annotation((1000*times.iloc[i]["start"], 1000*times.iloc[i]["end"]), 
+            ed.add_annotation((1000*times.iloc[i]["start"], 1000*times.iloc[i]["end"]),
                             annotation_name, tier_name=times.iloc[i][feature_col_name])
         if len(times) == 0:
-            ed.add_annotation((0,0.1), 
+            ed.add_annotation((0,0.1),
                                 "", feat)
 
     ed.write(output_path)
